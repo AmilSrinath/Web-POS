@@ -26,6 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
+  AlertCircle,
   Calendar,
   ChevronDown,
   ChevronRight,
@@ -38,66 +39,56 @@ import {
   Trash2,
 } from "lucide-react"
 
-// Sample product data with batches
+// Updated product data structure - removed price and stock from product level
 const initialProducts = [
   {
     id: "1",
     name: "Apples",
-    price: 2.99,
     unit: "kg",
-    stock: 125,
     category: "Fruits",
     barcode: "2000000001",
     batches: [
-      { id: "1-A", batchNumber: "A001", expiryDate: "2023-06-15", quantity: 50 },
-      { id: "1-B", batchNumber: "A002", expiryDate: "2023-06-20", quantity: 75 },
+      { id: "1-A", batchNumber: "A001", expiryDate: "2023-06-15", quantity: 50, price: 2.99 },
+      { id: "1-B", batchNumber: "A002", expiryDate: "2023-06-20", quantity: 75, price: 3.29 },
     ],
   },
   {
     id: "2",
     name: "Milk",
-    price: 3.49,
     unit: "liter",
-    stock: 30,
     category: "Dairy",
     barcode: "2000000002",
-    batches: [{ id: "2-A", batchNumber: "M101", expiryDate: "2023-05-10", quantity: 30 }],
+    batches: [{ id: "2-A", batchNumber: "M101", expiryDate: "2023-05-10", quantity: 30, price: 3.49 }],
   },
   {
     id: "3",
     name: "Bread",
-    price: 2.29,
     unit: "piece",
-    stock: 45,
     category: "Bakery",
     barcode: "2000000003",
     batches: [
-      { id: "3-A", batchNumber: "B201", expiryDate: "2023-05-05", quantity: 20 },
-      { id: "3-B", batchNumber: "B202", expiryDate: "2023-05-07", quantity: 25 },
+      { id: "3-A", batchNumber: "B201", expiryDate: "2023-05-05", quantity: 20, price: 2.29 },
+      { id: "3-B", batchNumber: "B202", expiryDate: "2023-05-07", quantity: 25, price: 2.19 },
     ],
   },
   {
     id: "4",
     name: "Chicken Breast",
-    price: 8.99,
     unit: "kg",
-    stock: 35,
     category: "Meat",
     barcode: "2000000004",
     batches: [
-      { id: "4-A", batchNumber: "C301", expiryDate: "2023-05-08", quantity: 15 },
-      { id: "4-B", batchNumber: "C302", expiryDate: "2023-05-12", quantity: 20 },
+      { id: "4-A", batchNumber: "C301", expiryDate: "2023-05-08", quantity: 15, price: 8.99 },
+      { id: "4-B", batchNumber: "C302", expiryDate: "2023-05-12", quantity: 20, price: 9.49 },
     ],
   },
   {
     id: "5",
     name: "Red Wine",
-    price: 12.99,
     unit: "bottle",
-    stock: 10,
     category: "Beverages",
     barcode: "2000000005",
-    batches: [{ id: "5-A", batchNumber: "W401", expiryDate: "2024-12-31", quantity: 10 }],
+    batches: [{ id: "5-A", batchNumber: "W401", expiryDate: "2024-12-31", quantity: 10, price: 12.99 }],
   },
 ]
 
@@ -111,19 +102,20 @@ export default function ProductsPage() {
   const [selectedBatch, setSelectedBatch] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
 
+  // Updated new product state - removed price
   const [newProduct, setNewProduct] = useState({
     name: "",
-    price: "",
     unit: "piece",
-    stock: "",
     category: "",
     barcode: "",
   })
 
+  // Updated new batch state - added price
   const [newBatch, setNewBatch] = useState({
     batchNumber: "",
     expiryDate: "",
     quantity: "",
+    price: "",
   })
 
   const filteredProducts = products.filter(
@@ -139,13 +131,40 @@ export default function ProductsPage() {
     )
   }
 
+  // Helper function to calculate total stock for a product
+  const calculateTotalStock = (product) => {
+    return product.batches.reduce((sum, batch) => sum + batch.quantity, 0)
+  }
+
+  // Helper function to calculate average price for a product
+  const calculateAveragePrice = (product) => {
+    if (product.batches.length === 0) return 0
+
+    // Calculate weighted average price based on quantity
+    const totalValue = product.batches.reduce((sum, batch) => sum + batch.price * batch.quantity, 0)
+    const totalQuantity = product.batches.reduce((sum, batch) => sum + batch.quantity, 0)
+
+    return totalQuantity > 0 ? totalValue / totalQuantity : 0
+  }
+
+  // Helper function to get the latest batch price
+  const getLatestBatchPrice = (product) => {
+    if (product.batches.length === 0) return 0
+
+    // Sort batches by expiry date (descending) and return the price of the latest batch
+    const sortedBatches = [...product.batches].sort(
+      (a, b) => new Date(b.expiryDate).getTime() - new Date(a.expiryDate).getTime(),
+    )
+
+    return sortedBatches[0].price
+  }
+
+  // Updated to remove price from product
   const handleAddProduct = () => {
     const productToAdd = {
       id: Date.now().toString(),
       name: newProduct.name,
-      price: Number.parseFloat(newProduct.price),
       unit: newProduct.unit,
-      stock: 0, // Stock will be calculated from batches
       category: newProduct.category,
       barcode: newProduct.barcode || generateBarcode(Date.now().toString()),
       batches: [],
@@ -154,15 +173,14 @@ export default function ProductsPage() {
     setProducts([...products, productToAdd])
     setNewProduct({
       name: "",
-      price: "",
       unit: "piece",
-      stock: "",
       category: "",
       barcode: "",
     })
     setProductDialogOpen(false)
   }
 
+  // Updated to remove price from product
   const handleEditProduct = () => {
     if (!selectedProduct) return
 
@@ -171,7 +189,6 @@ export default function ProductsPage() {
         return {
           ...product,
           name: newProduct.name,
-          price: Number.parseFloat(newProduct.price),
           unit: newProduct.unit,
           category: newProduct.category,
           barcode: newProduct.barcode,
@@ -189,13 +206,12 @@ export default function ProductsPage() {
     setProducts(products.filter((product) => product.id !== productId))
   }
 
+  // Updated to remove price from product
   const openEditProductDialog = (product) => {
     setSelectedProduct(product)
     setNewProduct({
       name: product.name,
-      price: product.price.toString(),
       unit: product.unit,
-      stock: product.stock.toString(),
       category: product.category,
       barcode: product.barcode,
     })
@@ -209,11 +225,13 @@ export default function ProductsPage() {
       batchNumber: "",
       expiryDate: new Date().toISOString().split("T")[0],
       quantity: "",
+      price: "",
     })
     setIsEditing(false)
     setBatchDialogOpen(true)
   }
 
+  // Updated to include price in batch
   const openEditBatchDialog = (product, batch) => {
     setSelectedProduct(product)
     setSelectedBatch(batch)
@@ -221,11 +239,13 @@ export default function ProductsPage() {
       batchNumber: batch.batchNumber,
       expiryDate: batch.expiryDate,
       quantity: batch.quantity.toString(),
+      price: batch.price.toString(),
     })
     setIsEditing(true)
     setBatchDialogOpen(true)
   }
 
+  // Updated to include price in batch
   const handleAddBatch = () => {
     if (!selectedProduct) return
 
@@ -234,17 +254,14 @@ export default function ProductsPage() {
       batchNumber: newBatch.batchNumber,
       expiryDate: newBatch.expiryDate,
       quantity: Number.parseInt(newBatch.quantity),
+      price: Number.parseFloat(newBatch.price),
     }
 
     const updatedProducts = products.map((product) => {
       if (product.id === selectedProduct.id) {
-        const updatedBatches = [...product.batches, batchToAdd]
-        const totalStock = updatedBatches.reduce((sum, batch) => sum + batch.quantity, 0)
-
         return {
           ...product,
-          batches: updatedBatches,
-          stock: totalStock,
+          batches: [...product.batches, batchToAdd],
         }
       }
       return product
@@ -254,6 +271,7 @@ export default function ProductsPage() {
     setBatchDialogOpen(false)
   }
 
+  // Updated to include price in batch
   const handleEditBatch = () => {
     if (!selectedProduct || !selectedBatch) return
 
@@ -266,17 +284,15 @@ export default function ProductsPage() {
               batchNumber: newBatch.batchNumber,
               expiryDate: newBatch.expiryDate,
               quantity: Number.parseInt(newBatch.quantity),
+              price: Number.parseFloat(newBatch.price),
             }
           }
           return batch
         })
 
-        const totalStock = updatedBatches.reduce((sum, batch) => sum + batch.quantity, 0)
-
         return {
           ...product,
           batches: updatedBatches,
-          stock: totalStock,
         }
       }
       return product
@@ -290,13 +306,9 @@ export default function ProductsPage() {
   const handleDeleteBatch = (productId: string, batchId: string) => {
     const updatedProducts = products.map((product) => {
       if (product.id === productId) {
-        const updatedBatches = product.batches.filter((batch) => batch.id !== batchId)
-        const totalStock = updatedBatches.reduce((sum, batch) => sum + batch.quantity, 0)
-
         return {
           ...product,
-          batches: updatedBatches,
-          stock: totalStock,
+          batches: product.batches.filter((batch) => batch.id !== batchId),
         }
       }
       return product
@@ -348,17 +360,6 @@ export default function ProductsPage() {
               </div>
               <div className="grid grid-cols-2 gap-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="price">Price</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    value={newProduct.price}
-                    onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-                    className="h-10"
-                  />
-                </div>
-                <div className="grid gap-3">
                   <Label htmlFor="unit">Unit</Label>
                   <Select
                     value={newProduct.unit}
@@ -379,8 +380,6 @@ export default function ProductsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-6">
                 <div className="grid gap-3">
                   <Label htmlFor="category">Category</Label>
                   <Input
@@ -390,20 +389,29 @@ export default function ProductsPage() {
                     className="h-10"
                   />
                 </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="barcode">Barcode (optional)</Label>
-                  <div className="relative">
-                    <ScanBarcode className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="barcode"
-                      value={newProduct.barcode}
-                      onChange={(e) => setNewProduct({ ...newProduct, barcode: e.target.value })}
-                      className="h-10 pl-9"
-                      placeholder="Auto-generated if empty"
-                    />
-                  </div>
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="barcode">Barcode (optional)</Label>
+                <div className="relative">
+                  <ScanBarcode className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="barcode"
+                    value={newProduct.barcode}
+                    onChange={(e) => setNewProduct({ ...newProduct, barcode: e.target.value })}
+                    className="h-10 pl-9"
+                    placeholder="Auto-generated if empty"
+                  />
                 </div>
               </div>
+              {!isEditing && (
+                <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/30 rounded-md p-3 text-sm text-amber-600 dark:text-amber-400 flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <div>
+                    After creating the product, you'll need to add at least one batch with price and quantity
+                    information.
+                  </div>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button
@@ -422,7 +430,7 @@ export default function ProductsPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Batch Dialog */}
+        {/* Batch Dialog - Updated to include price */}
         <Dialog open={batchDialogOpen} onOpenChange={setBatchDialogOpen}>
           <DialogContent className="sm:max-w-[550px]">
             <DialogHeader>
@@ -445,17 +453,15 @@ export default function ProductsPage() {
               </div>
               <div className="grid grid-cols-2 gap-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="expiryDate">Expiry Date</Label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="expiryDate"
-                      type="date"
-                      value={newBatch.expiryDate}
-                      onChange={(e) => setNewBatch({ ...newBatch, expiryDate: e.target.value })}
-                      className="h-10 pl-9"
-                    />
-                  </div>
+                  <Label htmlFor="price">Price (per {selectedProduct?.unit})</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    value={newBatch.price}
+                    onChange={(e) => setNewBatch({ ...newBatch, price: e.target.value })}
+                    className="h-10"
+                  />
                 </div>
                 <div className="grid gap-3">
                   <Label htmlFor="quantity">Quantity ({selectedProduct?.unit})</Label>
@@ -465,6 +471,19 @@ export default function ProductsPage() {
                     value={newBatch.quantity}
                     onChange={(e) => setNewBatch({ ...newBatch, quantity: e.target.value })}
                     className="h-10"
+                  />
+                </div>
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="expiryDate">Expiry Date</Label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="expiryDate"
+                    type="date"
+                    value={newBatch.expiryDate}
+                    onChange={(e) => setNewBatch({ ...newBatch, expiryDate: e.target.value })}
+                    className="h-10 pl-9"
                   />
                 </div>
               </div>
@@ -512,9 +531,9 @@ export default function ProductsPage() {
                   <TableRow>
                     <TableHead className="w-10"></TableHead>
                     <TableHead className="w-[20%]">Name</TableHead>
-                    <TableHead className="w-[10%]">Price</TableHead>
+                    <TableHead className="w-[10%]">Current Price</TableHead>
                     <TableHead className="w-[10%]">Unit</TableHead>
-                    <TableHead className="w-[10%]">Stock</TableHead>
+                    <TableHead className="w-[10%]">Total Stock</TableHead>
                     <TableHead className="w-[15%]">Category</TableHead>
                     <TableHead className="w-[15%]">Barcode</TableHead>
                     <TableHead className="w-[10%] text-right">Actions</TableHead>
@@ -539,14 +558,34 @@ export default function ProductsPage() {
                           </Button>
                         </TableCell>
                         <TableCell className="font-medium">{product.name}</TableCell>
-                        <TableCell>${product.price.toFixed(2)}</TableCell>
+                        <TableCell>
+                          {product.batches.length > 0 ? (
+                            `$${getLatestBatchPrice(product).toFixed(2)}`
+                          ) : (
+                            <Badge variant="outline" className="text-muted-foreground">
+                              No batches
+                            </Badge>
+                          )}
+                        </TableCell>
                         <TableCell>{product.unit}</TableCell>
                         <TableCell>
-                          <Badge
-                            variant={product.stock > 50 ? "default" : product.stock > 20 ? "outline" : "destructive"}
-                          >
-                            {product.stock}
-                          </Badge>
+                          {product.batches.length > 0 ? (
+                            <Badge
+                              variant={
+                                calculateTotalStock(product) > 50
+                                  ? "default"
+                                  : calculateTotalStock(product) > 20
+                                    ? "outline"
+                                    : "destructive"
+                              }
+                            >
+                              {calculateTotalStock(product)}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-muted-foreground">
+                              No stock
+                            </Badge>
+                          )}
                         </TableCell>
                         <TableCell>{product.category}</TableCell>
                         <TableCell>
@@ -599,9 +638,10 @@ export default function ProductsPage() {
                                 <Table>
                                   <TableHeader>
                                     <TableRow>
-                                      <TableHead className="w-[30%]">Batch Number</TableHead>
-                                      <TableHead className="w-[30%]">Expiry Date</TableHead>
-                                      <TableHead className="w-[25%]">Quantity</TableHead>
+                                      <TableHead className="w-[20%]">Batch Number</TableHead>
+                                      <TableHead className="w-[20%]">Price</TableHead>
+                                      <TableHead className="w-[20%]">Quantity</TableHead>
+                                      <TableHead className="w-[25%]">Expiry Date</TableHead>
                                       <TableHead className="w-[15%] text-right">Actions</TableHead>
                                     </TableRow>
                                   </TableHeader>
@@ -609,17 +649,18 @@ export default function ProductsPage() {
                                     {product.batches.map((batch) => (
                                       <TableRow key={batch.id}>
                                         <TableCell className="font-medium">{batch.batchNumber}</TableCell>
-                                        <TableCell>
-                                          <div className="flex items-center gap-1">
-                                            <Calendar className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
-                                            <span>{formatDate(batch.expiryDate)}</span>
-                                          </div>
-                                        </TableCell>
+                                        <TableCell>${batch.price.toFixed(2)}</TableCell>
                                         <TableCell>
                                           <Badge variant="outline">
                                             {batch.quantity} {product.unit}
                                             {product.unit === "piece" && batch.quantity !== 1 ? "s" : ""}
                                           </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                          <div className="flex items-center gap-1">
+                                            <Calendar className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
+                                            <span>{formatDate(batch.expiryDate)}</span>
+                                          </div>
                                         </TableCell>
                                         <TableCell className="text-right">
                                           <div className="flex justify-end gap-2">
@@ -649,6 +690,12 @@ export default function ProductsPage() {
                             ) : (
                               <div className="rounded-md border bg-background p-4 text-center text-sm text-muted-foreground">
                                 No batches available for this product.
+                                <div className="mt-2">
+                                  <Button variant="outline" size="sm" onClick={() => openAddBatchDialog(product)}>
+                                    <Plus className="mr-1 h-3 w-3" />
+                                    Add First Batch
+                                  </Button>
+                                </div>
                               </div>
                             )}
                           </TableCell>
@@ -688,8 +735,21 @@ export default function ProductsPage() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Products with No Stock</span>
+                  <span className="font-medium">
+                    {products.filter((product) => calculateTotalStock(product) === 0).length}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Low Stock Items</span>
-                  <span className="font-medium">{products.filter((p) => p.stock <= 20).length}</span>
+                  <span className="font-medium">
+                    {
+                      products.filter((product) => {
+                        const stock = calculateTotalStock(product)
+                        return stock > 0 && stock <= 20
+                      }).length
+                    }
+                  </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Expiring Soon</span>
