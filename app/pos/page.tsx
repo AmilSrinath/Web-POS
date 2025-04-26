@@ -313,6 +313,11 @@ export default function POSPage() {
 
   const removeFromCart = (cartItemId) => {
     setCart(cart.filter((item) => item.cartItemId !== cartItemId))
+
+    // Focus back on barcode input after removing item
+    if (barcodeInputRef.current) {
+      barcodeInputRef.current.focus()
+    }
   }
 
   const updateQuantity = (cartItemId, newQuantity) => {
@@ -550,6 +555,13 @@ export default function POSPage() {
     addToCart(selectedProduct, selectedBatch, quantity)
     setQuantityDialogOpen(false)
     setSelectedBatch(null)
+
+    // Focus is already handled in addToCart, but adding here for redundancy
+    setTimeout(() => {
+      if (barcodeInputRef.current) {
+        barcodeInputRef.current.focus()
+      }
+    }, 100)
   }
 
   const calculateTotal = () => {
@@ -585,6 +597,11 @@ export default function POSPage() {
     setCart([])
     setSuccessMessage(`Sale completed: $${total.toFixed(2)}`)
     setTimeout(() => setSuccessMessage(""), 3000)
+
+    // Focus back on barcode input after completing sale
+    if (barcodeInputRef.current) {
+      barcodeInputRef.current.focus()
+    }
   }
 
   // Add a keyDown handler for the quantity dialog
@@ -634,6 +651,19 @@ export default function POSPage() {
     // Simple barcode generation - in a real system this would be more sophisticated
     return `2000000${productId.toString().padStart(3, "0")}`
   }
+
+  // Add this useEffect to focus barcode input when dialogs close
+  useEffect(() => {
+    if (!batchDialogOpen && !quantityDialogOpen && !customerDialogOpen) {
+      // Short timeout to ensure focus happens after dialog animations
+      const timer = setTimeout(() => {
+        if (barcodeInputRef.current) {
+          barcodeInputRef.current.focus()
+        }
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [batchDialogOpen, quantityDialogOpen, customerDialogOpen])
 
   return (
     <div className="flex h-screen flex-col bg-background">
