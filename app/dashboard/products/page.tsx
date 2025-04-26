@@ -31,15 +31,19 @@ import {
   ChevronDown,
   ChevronRight,
   Edit,
+  Eye,
+  ImageIcon,
   MoreHorizontal,
   Package,
   Plus,
   Search,
   ScanBarcode,
   Trash2,
+  Upload,
 } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-// Updated product data structure - removed price and stock from product level
+// Updated product data structure with image URLs
 const initialProducts = [
   {
     id: "1",
@@ -47,6 +51,7 @@ const initialProducts = [
     unit: "kg",
     category: "Fruits",
     barcode: "2000000001",
+    imageUrl: "/single-red-apple.png",
     batches: [
       { id: "1-A", batchNumber: "A001", expiryDate: "2023-06-15", quantity: 50, price: 2.99 },
       { id: "1-B", batchNumber: "A002", expiryDate: "2023-06-20", quantity: 75, price: 3.29 },
@@ -58,6 +63,7 @@ const initialProducts = [
     unit: "liter",
     category: "Dairy",
     barcode: "2000000002",
+    imageUrl: "/classic-milk-carton.png",
     batches: [{ id: "2-A", batchNumber: "M101", expiryDate: "2023-05-10", quantity: 30, price: 3.49 }],
   },
   {
@@ -66,6 +72,7 @@ const initialProducts = [
     unit: "piece",
     category: "Bakery",
     barcode: "2000000003",
+    imageUrl: "/golden-crust-loaf.png",
     batches: [
       { id: "3-A", batchNumber: "B201", expiryDate: "2023-05-05", quantity: 20, price: 2.29 },
       { id: "3-B", batchNumber: "B202", expiryDate: "2023-05-07", quantity: 25, price: 2.19 },
@@ -77,6 +84,7 @@ const initialProducts = [
     unit: "kg",
     category: "Meat",
     barcode: "2000000004",
+    imageUrl: "/pan-seared-chicken.png",
     batches: [
       { id: "4-A", batchNumber: "C301", expiryDate: "2023-05-08", quantity: 15, price: 8.99 },
       { id: "4-B", batchNumber: "C302", expiryDate: "2023-05-12", quantity: 20, price: 9.49 },
@@ -88,6 +96,7 @@ const initialProducts = [
     unit: "bottle",
     category: "Beverages",
     barcode: "2000000005",
+    imageUrl: "/elegant-red-wine.png",
     batches: [{ id: "5-A", batchNumber: "W401", expiryDate: "2024-12-31", quantity: 10, price: 12.99 }],
   },
 ]
@@ -96,21 +105,23 @@ export default function ProductsPage() {
   const [products, setProducts] = useState(initialProducts)
   const [productDialogOpen, setProductDialogOpen] = useState(false)
   const [batchDialogOpen, setBatchDialogOpen] = useState(false)
+  const [productDetailOpen, setProductDetailOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [expandedProducts, setExpandedProducts] = useState<string[]>([])
   const [selectedProduct, setSelectedProduct] = useState<any>(null)
   const [selectedBatch, setSelectedBatch] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
 
-  // Updated new product state - removed price
+  // Updated new product state - added imageUrl
   const [newProduct, setNewProduct] = useState({
     name: "",
     unit: "piece",
     category: "",
     barcode: "",
+    imageUrl: "",
   })
 
-  // Updated new batch state - added price
+  // Updated new batch state
   const [newBatch, setNewBatch] = useState({
     batchNumber: "",
     expiryDate: "",
@@ -159,7 +170,7 @@ export default function ProductsPage() {
     return sortedBatches[0].price
   }
 
-  // Updated to remove price from product
+  // Updated to include imageUrl
   const handleAddProduct = () => {
     const productToAdd = {
       id: Date.now().toString(),
@@ -167,6 +178,8 @@ export default function ProductsPage() {
       unit: newProduct.unit,
       category: newProduct.category,
       barcode: newProduct.barcode || generateBarcode(Date.now().toString()),
+      imageUrl:
+        newProduct.imageUrl || `/placeholder.svg?height=200&width=200&query=${encodeURIComponent(newProduct.name)}`,
       batches: [],
     }
 
@@ -176,11 +189,12 @@ export default function ProductsPage() {
       unit: "piece",
       category: "",
       barcode: "",
+      imageUrl: "",
     })
     setProductDialogOpen(false)
   }
 
-  // Updated to remove price from product
+  // Updated to include imageUrl
   const handleEditProduct = () => {
     if (!selectedProduct) return
 
@@ -192,6 +206,7 @@ export default function ProductsPage() {
           unit: newProduct.unit,
           category: newProduct.category,
           barcode: newProduct.barcode,
+          imageUrl: newProduct.imageUrl || product.imageUrl,
         }
       }
       return product
@@ -206,7 +221,7 @@ export default function ProductsPage() {
     setProducts(products.filter((product) => product.id !== productId))
   }
 
-  // Updated to remove price from product
+  // Updated to include imageUrl
   const openEditProductDialog = (product) => {
     setSelectedProduct(product)
     setNewProduct({
@@ -214,9 +229,15 @@ export default function ProductsPage() {
       unit: product.unit,
       category: product.category,
       barcode: product.barcode,
+      imageUrl: product.imageUrl,
     })
     setIsEditing(true)
     setProductDialogOpen(true)
+  }
+
+  const openProductDetail = (product) => {
+    setSelectedProduct(product)
+    setProductDetailOpen(true)
   }
 
   const openAddBatchDialog = (product) => {
@@ -231,7 +252,6 @@ export default function ProductsPage() {
     setBatchDialogOpen(true)
   }
 
-  // Updated to include price in batch
   const openEditBatchDialog = (product, batch) => {
     setSelectedProduct(product)
     setSelectedBatch(batch)
@@ -245,7 +265,6 @@ export default function ProductsPage() {
     setBatchDialogOpen(true)
   }
 
-  // Updated to include price in batch
   const handleAddBatch = () => {
     if (!selectedProduct) return
 
@@ -271,7 +290,6 @@ export default function ProductsPage() {
     setBatchDialogOpen(false)
   }
 
-  // Updated to include price in batch
   const handleEditBatch = () => {
     if (!selectedProduct || !selectedBatch) return
 
@@ -403,6 +421,26 @@ export default function ProductsPage() {
                   />
                 </div>
               </div>
+              <div className="grid gap-3">
+                <Label htmlFor="imageUrl">Product Image URL (optional)</Label>
+                <div className="relative">
+                  <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="imageUrl"
+                    value={newProduct.imageUrl}
+                    onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
+                    className="h-10 pl-9"
+                    placeholder="Enter image URL or leave empty for default"
+                  />
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <Button variant="outline" size="sm" className="h-8">
+                    <Upload className="h-3.5 w-3.5 mr-1" />
+                    Upload Image
+                  </Button>
+                  <span className="text-xs text-muted-foreground">Supported formats: JPG, PNG, WebP (max 2MB)</span>
+                </div>
+              </div>
               {!isEditing && (
                 <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/30 rounded-md p-3 text-sm text-amber-600 dark:text-amber-400 flex items-start gap-2">
                   <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -430,7 +468,7 @@ export default function ProductsPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Batch Dialog - Updated to include price */}
+        {/* Batch Dialog */}
         <Dialog open={batchDialogOpen} onOpenChange={setBatchDialogOpen}>
           <DialogContent className="sm:max-w-[550px]">
             <DialogHeader>
@@ -504,6 +542,134 @@ export default function ProductsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Product Detail Dialog */}
+        <Dialog open={productDetailOpen} onOpenChange={setProductDetailOpen}>
+          <DialogContent className="sm:max-w-[700px]">
+            {selectedProduct && (
+              <>
+                <DialogHeader>
+                  <DialogTitle>{selectedProduct.name}</DialogTitle>
+                  <DialogDescription>Product details and batch management</DialogDescription>
+                </DialogHeader>
+                <div className="grid md:grid-cols-2 gap-6 py-4">
+                  <div className="space-y-4">
+                    <div className="aspect-square relative rounded-md overflow-hidden border bg-muted">
+                      <img
+                        src={selectedProduct.imageUrl || "/placeholder.svg"}
+                        alt={selectedProduct.name}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Category:</span>
+                        <span className="text-sm font-medium">{selectedProduct.category}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Unit:</span>
+                        <span className="text-sm font-medium">{selectedProduct.unit}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Barcode:</span>
+                        <span className="text-sm font-mono">{selectedProduct.barcode}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Total Stock:</span>
+                        <Badge variant={calculateTotalStock(selectedProduct) > 20 ? "default" : "destructive"}>
+                          {calculateTotalStock(selectedProduct)} {selectedProduct.unit}
+                          {selectedProduct.unit === "piece" && calculateTotalStock(selectedProduct) !== 1 ? "s" : ""}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">Current Price:</span>
+                        <span className="text-sm font-medium">
+                          $
+                          {selectedProduct.batches.length > 0 ? getLatestBatchPrice(selectedProduct).toFixed(2) : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-medium">Batches</h3>
+                      <Button size="sm" onClick={() => openAddBatchDialog(selectedProduct)}>
+                        <Plus className="h-3.5 w-3.5 mr-1" />
+                        Add Batch
+                      </Button>
+                    </div>
+
+                    {selectedProduct.batches.length > 0 ? (
+                      <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                        {selectedProduct.batches.map((batch) => (
+                          <Card key={batch.id} className="overflow-hidden">
+                            <CardContent className="p-3">
+                              <div className="flex justify-between items-center">
+                                <div>
+                                  <div className="font-medium">Batch {batch.batchNumber}</div>
+                                  <div className="text-sm text-muted-foreground flex items-center mt-1">
+                                    <Calendar className="h-3.5 w-3.5 mr-1" />
+                                    Expires: {formatDate(batch.expiryDate)}
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-lg font-semibold">${batch.price.toFixed(2)}</div>
+                                  <Badge variant="outline" className="mt-1">
+                                    {batch.quantity} {selectedProduct.unit}
+                                    {selectedProduct.unit === "piece" && batch.quantity !== 1 ? "s" : ""}
+                                  </Badge>
+                                </div>
+                              </div>
+                              <div className="flex justify-end gap-2 mt-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openEditBatchDialog(selectedProduct, batch)}
+                                >
+                                  <Edit className="h-3.5 w-3.5 mr-1" />
+                                  Edit
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-destructive"
+                                  onClick={() => handleDeleteBatch(selectedProduct.id, batch.id)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5 mr-1" />
+                                  Delete
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="rounded-md border bg-muted/30 p-4 text-center text-sm text-muted-foreground">
+                        No batches available for this product.
+                        <div className="mt-2">
+                          <Button variant="outline" size="sm" onClick={() => openAddBatchDialog(selectedProduct)}>
+                            <Plus className="mr-1 h-3 w-3" />
+                            Add First Batch
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setProductDetailOpen(false)}>
+                    Close
+                  </Button>
+                  <Button onClick={() => openEditProductDialog(selectedProduct)}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Product
+                  </Button>
+                </DialogFooter>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
@@ -525,194 +691,290 @@ export default function ProductsPage() {
             <CardDescription>Manage your product catalog, batches, and inventory levels.</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="rounded-md border overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-10"></TableHead>
-                    <TableHead className="w-[20%]">Name</TableHead>
-                    <TableHead className="w-[10%]">Current Price</TableHead>
-                    <TableHead className="w-[10%]">Unit</TableHead>
-                    <TableHead className="w-[10%]">Total Stock</TableHead>
-                    <TableHead className="w-[15%]">Category</TableHead>
-                    <TableHead className="w-[15%]">Barcode</TableHead>
-                    <TableHead className="w-[10%] text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredProducts.map((product) => (
-                    <>
-                      <TableRow key={product.id} className="group">
-                        <TableCell className="p-0 w-10">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => toggleProductExpand(product.id)}
-                          >
-                            {expandedProducts.includes(product.id) ? (
-                              <ChevronDown className="h-4 w-4" />
-                            ) : (
-                              <ChevronRight className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </TableCell>
-                        <TableCell className="font-medium">{product.name}</TableCell>
-                        <TableCell>
-                          {product.batches.length > 0 ? (
-                            `$${getLatestBatchPrice(product).toFixed(2)}`
-                          ) : (
-                            <Badge variant="outline" className="text-muted-foreground">
-                              No batches
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>{product.unit}</TableCell>
-                        <TableCell>
-                          {product.batches.length > 0 ? (
-                            <Badge
-                              variant={
-                                calculateTotalStock(product) > 50
-                                  ? "default"
-                                  : calculateTotalStock(product) > 20
-                                    ? "outline"
-                                    : "destructive"
-                              }
-                            >
-                              {calculateTotalStock(product)}
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-muted-foreground">
-                              No stock
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>{product.category}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2 max-w-[150px]">
-                            <ScanBarcode className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-                            <span className="text-xs font-mono truncate">{product.barcode}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => openEditProductDialog(product)}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit Product
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => openAddBatchDialog(product)}>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Add Batch
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="text-destructive"
-                                onClick={() => handleDeleteProduct(product.id)}
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete Product
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
+            <Tabs defaultValue="table" className="w-full">
+              <div className="px-6 pt-2">
+                <TabsList className="grid w-[400px] grid-cols-2">
+                  <TabsTrigger value="table">Table View</TabsTrigger>
+                  <TabsTrigger value="grid">Grid View</TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="table" className="mt-0">
+                <div className="rounded-md border overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-10"></TableHead>
+                        <TableHead className="w-[20%]">Name</TableHead>
+                        <TableHead className="w-[10%]">Current Price</TableHead>
+                        <TableHead className="w-[10%]">Unit</TableHead>
+                        <TableHead className="w-[10%]">Total Stock</TableHead>
+                        <TableHead className="w-[15%]">Category</TableHead>
+                        <TableHead className="w-[15%]">Barcode</TableHead>
+                        <TableHead className="w-[10%] text-right">Actions</TableHead>
                       </TableRow>
-                      {expandedProducts.includes(product.id) && (
-                        <TableRow className="bg-muted/50">
-                          <TableCell colSpan={8} className="p-4">
-                            <div className="mb-2 flex items-center justify-between">
-                              <h4 className="text-sm font-medium">Batches</h4>
-                              <Button variant="outline" size="sm" onClick={() => openAddBatchDialog(product)}>
-                                <Plus className="mr-1 h-3 w-3" />
-                                Add Batch
+                    </TableHeader>
+                    <TableBody>
+                      {filteredProducts.map((product) => (
+                        <>
+                          <TableRow key={product.id} className="group">
+                            <TableCell className="p-0 w-10">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => toggleProductExpand(product.id)}
+                              >
+                                {expandedProducts.includes(product.id) ? (
+                                  <ChevronDown className="h-4 w-4" />
+                                ) : (
+                                  <ChevronRight className="h-4 w-4" />
+                                )}
                               </Button>
-                            </div>
-                            {product.batches.length > 0 ? (
-                              <div className="rounded-md border bg-background overflow-x-auto">
-                                <Table>
-                                  <TableHeader>
-                                    <TableRow>
-                                      <TableHead className="w-[20%]">Batch Number</TableHead>
-                                      <TableHead className="w-[20%]">Price</TableHead>
-                                      <TableHead className="w-[20%]">Quantity</TableHead>
-                                      <TableHead className="w-[25%]">Expiry Date</TableHead>
-                                      <TableHead className="w-[15%] text-right">Actions</TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    {product.batches.map((batch) => (
-                                      <TableRow key={batch.id}>
-                                        <TableCell className="font-medium">{batch.batchNumber}</TableCell>
-                                        <TableCell>${batch.price.toFixed(2)}</TableCell>
-                                        <TableCell>
-                                          <Badge variant="outline">
-                                            {batch.quantity} {product.unit}
-                                            {product.unit === "piece" && batch.quantity !== 1 ? "s" : ""}
-                                          </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                          <div className="flex items-center gap-1">
-                                            <Calendar className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
-                                            <span>{formatDate(batch.expiryDate)}</span>
-                                          </div>
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                          <div className="flex justify-end gap-2">
-                                            <Button
-                                              variant="ghost"
-                                              size="icon"
-                                              className="h-7 w-7"
-                                              onClick={() => openEditBatchDialog(product, batch)}
-                                            >
-                                              <Edit className="h-3.5 w-3.5" />
-                                            </Button>
-                                            <Button
-                                              variant="ghost"
-                                              size="icon"
-                                              className="h-7 w-7 text-destructive"
-                                              onClick={() => handleDeleteBatch(product.id, batch.id)}
-                                            >
-                                              <Trash2 className="h-3.5 w-3.5" />
-                                            </Button>
-                                          </div>
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              <div className="flex items-center gap-3">
+                                <div className="h-8 w-8 rounded-md border bg-muted overflow-hidden flex-shrink-0">
+                                  <img
+                                    src={product.imageUrl || "/placeholder.svg"}
+                                    alt={product.name}
+                                    className="h-full w-full object-cover"
+                                  />
+                                </div>
+                                {product.name}
                               </div>
-                            ) : (
-                              <div className="rounded-md border bg-background p-4 text-center text-sm text-muted-foreground">
-                                No batches available for this product.
-                                <div className="mt-2">
+                            </TableCell>
+                            <TableCell>
+                              {product.batches.length > 0 ? (
+                                `$${getLatestBatchPrice(product).toFixed(2)}`
+                              ) : (
+                                <Badge variant="outline" className="text-muted-foreground">
+                                  No batches
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>{product.unit}</TableCell>
+                            <TableCell>
+                              {product.batches.length > 0 ? (
+                                <Badge
+                                  variant={
+                                    calculateTotalStock(product) > 50
+                                      ? "default"
+                                      : calculateTotalStock(product) > 20
+                                        ? "outline"
+                                        : "destructive"
+                                  }
+                                >
+                                  {calculateTotalStock(product)}
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="text-muted-foreground">
+                                  No stock
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>{product.category}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2 max-w-[150px]">
+                                <ScanBarcode className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                                <span className="text-xs font-mono truncate">{product.barcode}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-1">
+                                <Button variant="ghost" size="icon" onClick={() => openProductDetail(product)}>
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={() => openEditProductDialog(product)}>
+                                      <Edit className="mr-2 h-4 w-4" />
+                                      Edit Product
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => openAddBatchDialog(product)}>
+                                      <Plus className="mr-2 h-4 w-4" />
+                                      Add Batch
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      className="text-destructive"
+                                      onClick={() => handleDeleteProduct(product.id)}
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      Delete Product
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                          {expandedProducts.includes(product.id) && (
+                            <TableRow className="bg-muted/50">
+                              <TableCell colSpan={8} className="p-4">
+                                <div className="mb-2 flex items-center justify-between">
+                                  <h4 className="text-sm font-medium">Batches</h4>
                                   <Button variant="outline" size="sm" onClick={() => openAddBatchDialog(product)}>
                                     <Plus className="mr-1 h-3 w-3" />
-                                    Add First Batch
+                                    Add Batch
                                   </Button>
                                 </div>
-                              </div>
-                            )}
+                                {product.batches.length > 0 ? (
+                                  <div className="rounded-md border bg-background overflow-x-auto">
+                                    <Table>
+                                      <TableHeader>
+                                        <TableRow>
+                                          <TableHead className="w-[20%]">Batch Number</TableHead>
+                                          <TableHead className="w-[20%]">Price</TableHead>
+                                          <TableHead className="w-[20%]">Quantity</TableHead>
+                                          <TableHead className="w-[25%]">Expiry Date</TableHead>
+                                          <TableHead className="w-[15%] text-right">Actions</TableHead>
+                                        </TableRow>
+                                      </TableHeader>
+                                      <TableBody>
+                                        {product.batches.map((batch) => (
+                                          <TableRow key={batch.id}>
+                                            <TableCell className="font-medium">{batch.batchNumber}</TableCell>
+                                            <TableCell>${batch.price.toFixed(2)}</TableCell>
+                                            <TableCell>
+                                              <Badge variant="outline">
+                                                {batch.quantity} {product.unit}
+                                                {product.unit === "piece" && batch.quantity !== 1 ? "s" : ""}
+                                              </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                              <div className="flex items-center gap-1">
+                                                <Calendar className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
+                                                <span>{formatDate(batch.expiryDate)}</span>
+                                              </div>
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                              <div className="flex justify-end gap-2">
+                                                <Button
+                                                  variant="ghost"
+                                                  size="icon"
+                                                  className="h-7 w-7"
+                                                  onClick={() => openEditBatchDialog(product, batch)}
+                                                >
+                                                  <Edit className="h-3.5 w-3.5" />
+                                                </Button>
+                                                <Button
+                                                  variant="ghost"
+                                                  size="icon"
+                                                  className="h-7 w-7 text-destructive"
+                                                  onClick={() => handleDeleteBatch(product.id, batch.id)}
+                                                >
+                                                  <Trash2 className="h-3.5 w-3.5" />
+                                                </Button>
+                                              </div>
+                                            </TableCell>
+                                          </TableRow>
+                                        ))}
+                                      </TableBody>
+                                    </Table>
+                                  </div>
+                                ) : (
+                                  <div className="rounded-md border bg-background p-4 text-center text-sm text-muted-foreground">
+                                    No batches available for this product.
+                                    <div className="mt-2">
+                                      <Button variant="outline" size="sm" onClick={() => openAddBatchDialog(product)}>
+                                        <Plus className="mr-1 h-3 w-3" />
+                                        Add First Batch
+                                      </Button>
+                                    </div>
+                                  </div>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </>
+                      ))}
+                      {filteredProducts.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={8} className="h-24 text-center">
+                            No products found.
                           </TableCell>
                         </TableRow>
                       )}
-                    </>
+                    </TableBody>
+                  </Table>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="grid" className="mt-0 p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {filteredProducts.map((product) => (
+                    <Card key={product.id} className="overflow-hidden">
+                      <div className="aspect-square relative">
+                        <img
+                          src={product.imageUrl || "/placeholder.svg"}
+                          alt={product.name}
+                          className="object-cover w-full h-full"
+                        />
+                        <div className="absolute top-2 right-2">
+                          <Badge variant={product.batches.length > 0 ? "default" : "destructive"}>
+                            {product.batches.length > 0 ? `${calculateTotalStock(product)} in stock` : "No stock"}
+                          </Badge>
+                        </div>
+                      </div>
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-medium truncate">{product.name}</h3>
+                          <div className="text-lg font-semibold">
+                            {product.batches.length > 0 ? `$${getLatestBatchPrice(product).toFixed(2)}` : "N/A"}
+                          </div>
+                        </div>
+                        <div className="text-sm text-muted-foreground mb-3">
+                          {product.category} • {product.unit}
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <div className="text-xs text-muted-foreground flex items-center">
+                            <ScanBarcode className="h-3 w-3 mr-1" />
+                            {product.barcode}
+                          </div>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => openProductDetail(product)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => openEditProductDialog(product)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => openAddBatchDialog(product)}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   ))}
                   {filteredProducts.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={8} className="h-24 text-center">
-                        No products found.
-                      </TableCell>
-                    </TableRow>
+                    <div className="col-span-full h-40 flex items-center justify-center text-muted-foreground">
+                      No products found.
+                    </div>
                   )}
-                </TableBody>
-              </Table>
-            </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 

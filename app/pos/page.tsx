@@ -37,130 +37,130 @@ const products = [
   {
     id: "1",
     name: "Apples",
-    price: 2.99,
     unit: "kg",
     category: "Fruits",
     barcode: "2000000001",
+    imageUrl: "/single-red-apple.png",
     batches: [
-      { id: "1-A", batchNumber: "A001", expiryDate: "2023-06-15", quantity: 50 },
-      { id: "1-B", batchNumber: "A002", expiryDate: "2023-06-20", quantity: 75 },
+      { id: "1-A", batchNumber: "A001", expiryDate: "2023-06-15", quantity: 50, price: 2.99 },
+      { id: "1-B", batchNumber: "A002", expiryDate: "2023-06-20", quantity: 75, price: 3.29 },
     ],
   },
   {
     id: "2",
     name: "Milk",
-    price: 3.49,
     unit: "liter",
     category: "Dairy",
     barcode: "4796026408192",
-    batches: [{ id: "2-A", batchNumber: "M101", expiryDate: "2023-05-10", quantity: 30 }],
+    imageUrl: "/classic-milk-carton.png",
+    batches: [{ id: "2-A", batchNumber: "M101", expiryDate: "2023-05-10", quantity: 30, price: 3.49 }],
   },
   {
     id: "3",
     name: "Bread",
-    price: 2.29,
     unit: "piece",
     category: "Bakery",
     barcode: "2000000003",
+    imageUrl: "/golden-crust-loaf.png",
     batches: [
-      { id: "3-A", batchNumber: "B201", expiryDate: "2023-05-05", quantity: 20 },
-      { id: "3-B", batchNumber: "B202", expiryDate: "2023-05-07", quantity: 25 },
+      { id: "3-A", batchNumber: "B201", expiryDate: "2023-05-05", quantity: 20, price: 2.29 },
+      { id: "3-B", batchNumber: "B202", expiryDate: "2023-05-07", quantity: 25, price: 2.19 },
     ],
   },
   {
     id: "4",
     name: "Chicken Breast",
-    price: 8.99,
     unit: "kg",
     category: "Meat",
     barcode: "2000000004",
+    imageUrl: "/pan-seared-chicken.png",
     batches: [
-      { id: "4-A", batchNumber: "C301", expiryDate: "2023-05-08", quantity: 15 },
-      { id: "4-B", batchNumber: "C302", expiryDate: "2023-05-12", quantity: 20 },
+      { id: "4-A", batchNumber: "C301", expiryDate: "2023-05-08", quantity: 15, price: 8.99 },
+      { id: "4-B", batchNumber: "C302", expiryDate: "2023-05-12", quantity: 20, price: 9.49 },
     ],
   },
   {
     id: "5",
     name: "Red Wine",
-    price: 12.99,
     unit: "bottle",
     category: "Beverages",
     barcode: "2000000005",
-    batches: [{ id: "5-A", batchNumber: "W401", expiryDate: "2024-12-31", quantity: 10 }],
+    imageUrl: "/elegant-red-wine.png",
+    batches: [{ id: "5-A", batchNumber: "W401", expiryDate: "2024-12-31", quantity: 10, price: 12.99 }],
   },
   {
     id: "6",
     name: "Cheese",
-    price: 5.99,
     unit: "kg",
     category: "Dairy",
     barcode: "2000000006",
+    imageUrl: "/cheese-board-variety.png",
     batches: [
-      { id: "6-A", batchNumber: "CH501", expiryDate: "2023-06-01", quantity: 12 },
-      { id: "6-B", batchNumber: "CH502", expiryDate: "2023-06-15", quantity: 18 },
+      { id: "6-A", batchNumber: "CH501", expiryDate: "2023-06-01", quantity: 12, price: 5.99 },
+      { id: "6-B", batchNumber: "CH502", expiryDate: "2023-06-15", quantity: 18, price: 6.49 },
     ],
   },
   {
     id: "7",
     name: "Tomatoes",
-    price: 3.99,
     unit: "kg",
     category: "Vegetables",
     barcode: "2000000007",
+    imageUrl: "/ripe-red-tomatoes.png",
     batches: [
-      { id: "7-A", batchNumber: "T601", expiryDate: "2023-05-10", quantity: 30 },
-      { id: "7-B", batchNumber: "T602", expiryDate: "2023-05-15", quantity: 40 },
+      { id: "7-A", batchNumber: "T601", expiryDate: "2023-05-10", quantity: 30, price: 3.99 },
+      { id: "7-B", batchNumber: "T602", expiryDate: "2023-05-15", quantity: 40, price: 3.49 },
     ],
   },
   {
     id: "8",
     name: "Orange Juice",
-    price: 4.49,
     unit: "liter",
     category: "Beverages",
     barcode: "2000000008",
-    batches: [{ id: "8-A", batchNumber: "OJ701", expiryDate: "2023-05-20", quantity: 25 }],
+    imageUrl: "/refreshing-orange-juice.png",
+    batches: [{ id: "8-A", batchNumber: "OJ701", expiryDate: "2023-05-20", quantity: 25, price: 4.49 }],
   },
   {
     id: "9",
     name: "Chocolate Bar",
-    price: 1.99,
     unit: "piece",
     category: "Snacks",
     barcode: "2000000009",
-    batches: [{ id: "9-A", batchNumber: "CB801", expiryDate: "2023-08-15", quantity: 50 }],
+    imageUrl: "/decadent-chocolate-bar.png",
+    batches: [{ id: "9-A", batchNumber: "CB801", expiryDate: "2023-08-15", quantity: 50, price: 1.99 }],
   },
   {
     id: "10",
     name: "Bananas",
-    price: 1.49,
     unit: "kg",
     category: "Fruits",
     barcode: "2000000010",
+    imageUrl: "/bunch-of-bananas.png",
     batches: [
-      { id: "10-A", batchNumber: "BN901", expiryDate: "2023-05-07", quantity: 40 },
-      { id: "10-B", batchNumber: "BN902", expiryDate: "2023-05-10", quantity: 60 },
+      { id: "10-A", batchNumber: "BN901", expiryDate: "2023-05-07", quantity: 40, price: 1.49 },
+      { id: "10-B", batchNumber: "BN902", expiryDate: "2023-05-10", quantity: 60, price: 1.29 },
     ],
   },
   {
     id: "11",
     name: "Coffee Beans",
-    price: 9.99,
     unit: "kg",
     category: "Beverages",
     barcode: "2000000011",
-    batches: [{ id: "11-A", batchNumber: "CF101", expiryDate: "2023-12-31", quantity: 15 }],
+    imageUrl: "/roasted-coffee-pile.png",
+    batches: [{ id: "11-A", batchNumber: "CF101", expiryDate: "2023-12-31", quantity: 15, price: 9.99 }],
   },
   {
     id: "12",
     name: "Yogurt",
-    price: 2.49,
     unit: "piece",
     category: "Dairy",
     barcode: "2000000012",
+    imageUrl: "/creamy-yogurt-with-berries.png",
     batches: [
-      { id: "12-A", batchNumber: "YG111", expiryDate: "2023-05-15", quantity: 30 },
-      { id: "12-B", batchNumber: "YG112", expiryDate: "2023-05-20", quantity: 45 },
+      { id: "12-A", batchNumber: "YG111", expiryDate: "2023-05-15", quantity: 30, price: 2.49 },
+      { id: "12-B", batchNumber: "YG112", expiryDate: "2023-05-20", quantity: 45, price: 2.29 },
     ],
   },
 ]
@@ -201,6 +201,11 @@ export default function POSPage() {
 
   // Add a state to track the selected batch index
   const [selectedBatchIndex, setSelectedBatchIndex] = useState(0)
+
+  // Add a global barcode buffer and timer at the top of the component, after the useState declarations
+  const [barcodeBuffer, setBarcodeBuffer] = useState("")
+  const [lastKeyTime, setLastKeyTime] = useState(0)
+  const barcodeTimeoutRef = useRef(null)
 
   // Filter products based on search term
   const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -288,7 +293,7 @@ export default function POSPage() {
           cartItemId,
           id: product.id,
           name: product.name,
-          price: product.price,
+          price: batch.price, // Use batch price instead of product price
           unit: product.unit,
           batch,
           quantity: quantityValue,
@@ -297,7 +302,7 @@ export default function POSPage() {
     }
 
     // Show brief success message
-    setSuccessMessage(`Added: ${product.name} (Batch ${batch.batchNumber})`)
+    setSuccessMessage(`Added: ${product.name} (Batch ${batch.batchNumber}) at $${batch.price.toFixed(2)}`)
     setTimeout(() => setSuccessMessage(""), 3000)
 
     // Focus back on barcode input after adding to cart
@@ -409,6 +414,72 @@ export default function POSPage() {
     handleProductSelection(product)
   }
 
+  // Add a global keydown event listener to capture barcode scanner input
+  useEffect(() => {
+    // Barcode scanners typically send data very quickly, much faster than human typing
+    const BARCODE_SCAN_TIMEOUT = 50 // ms between keystrokes
+
+    const handleGlobalKeyDown = (e) => {
+      // Only process if it's a character key or Enter
+      if (e.key.length === 1 || e.key === "Enter") {
+        const currentTime = new Date().getTime()
+
+        // If this is a new scan sequence or continuing a fast sequence
+        if (currentTime - lastKeyTime <= BARCODE_SCAN_TIMEOUT || barcodeBuffer === "") {
+          // Clear any existing timeout
+          if (barcodeTimeoutRef.current) {
+            clearTimeout(barcodeTimeoutRef.current)
+          }
+
+          // If Enter key is pressed, process the barcode
+          if (e.key === "Enter") {
+            e.preventDefault() // Prevent form submissions
+
+            // Process the barcode
+            if (barcodeBuffer) {
+              // Set the barcode input value
+              setBarcodeInput(barcodeBuffer)
+
+              // Process the barcode immediately
+              const productWithBarcode = products.find((p) => p.barcode === barcodeBuffer)
+              if (productWithBarcode) {
+                handleProductSelection(productWithBarcode)
+              } else {
+                // Show error message if product not found
+                setErrorMessage(`Product with barcode ${barcodeBuffer} not found`)
+                setTimeout(() => setErrorMessage(""), 3000)
+              }
+
+              // Clear the buffer
+              setBarcodeBuffer("")
+            }
+          } else {
+            // Add the character to the buffer
+            setBarcodeBuffer((prev) => prev + e.key)
+
+            // Set a timeout to clear the buffer if no more keys are pressed
+            barcodeTimeoutRef.current = setTimeout(() => {
+              setBarcodeBuffer("")
+            }, BARCODE_SCAN_TIMEOUT + 50)
+          }
+
+          setLastKeyTime(currentTime)
+        }
+      }
+    }
+
+    // Add the event listener
+    window.addEventListener("keydown", handleGlobalKeyDown)
+
+    // Clean up
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown)
+      if (barcodeTimeoutRef.current) {
+        clearTimeout(barcodeTimeoutRef.current)
+      }
+    }
+  }, [barcodeBuffer, lastKeyTime, products])
+
   // Update the handleBarcodeSearch function to use the new handleProductSelection function
   const handleBarcodeSearch = (e) => {
     e.preventDefault()
@@ -425,21 +496,6 @@ export default function POSPage() {
       setErrorMessage(`Product with barcode ${barcodeInput} not found`)
       setTimeout(() => setErrorMessage(""), 3000)
       setBarcodeInput("")
-    }
-
-    // Refocus the barcode input for the next scan
-    setTimeout(() => {
-      if (barcodeInputRef.current) {
-        barcodeInputRef.current.focus()
-      }
-    }, 100)
-  }
-
-  // Add a function to handle barcode input key events
-  const handleBarcodeKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    // Most barcode scanners send an Enter key after scanning
-    if (e.key === "Enter") {
-      handleBarcodeSearch(e)
     }
   }
 
@@ -647,9 +703,16 @@ export default function POSPage() {
                       <div className="flex-1">
                         <div className="font-medium text-foreground">{product.name}</div>
                         <div className="text-sm text-muted-foreground">{product.category}</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {product.batches.length} {product.batches.length === 1 ? "batch" : "batches"} available
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="text-primary font-medium">${product.price.toFixed(2)}</div>
+                        <div className="text-primary font-medium">
+                          {product.batches.length > 0
+                            ? `$${Math.min(...product.batches.map((b) => b.price)).toFixed(2)} - $${Math.max(...product.batches.map((b) => b.price)).toFixed(2)}`
+                            : "No price"}
+                        </div>
                         <Badge variant="outline" className="text-foreground">
                           {product.unit}
                         </Badge>
@@ -668,7 +731,6 @@ export default function POSPage() {
                 className="w-full pl-9 h-11"
                 value={barcodeInput}
                 onChange={(e) => setBarcodeInput(e.target.value)}
-                onKeyDown={handleBarcodeKeyDown}
               />
             </form>
           </div>
@@ -708,7 +770,7 @@ export default function POSPage() {
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium truncate text-foreground">{item.name}</h3>
                           <div className="text-sm text-muted-foreground mt-0.5">
-                            ${item.price.toFixed(2)} / {item.unit}
+                            <span className="text-primary font-medium">${item.price.toFixed(2)}</span> / {item.unit}
                           </div>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge variant="outline" className="text-xs">
@@ -890,7 +952,8 @@ export default function POSPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <Badge variant="outline" className="mb-1">
+                      <div className="text-lg font-semibold text-primary">${batch.price.toFixed(2)}</div>
+                      <Badge variant="outline" className="mt-1">
                         {batch.quantity}{" "}
                         {selectedProduct?.unit === "piece"
                           ? batch.quantity === 1
@@ -898,7 +961,6 @@ export default function POSPage() {
                             : "pieces"
                           : selectedProduct?.unit}
                       </Badge>
-                      <div className="text-xs text-muted-foreground">Available</div>
                     </div>
                   </Label>
                 </div>
